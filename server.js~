@@ -7,9 +7,6 @@ var http = require('http').Server(app);
 var io = require('socket.io')(http);
 var TAFFY = require('taffy');
 
-var order_database = {};
-var chatting_orders = {};
-
 var order_db = TAFFY([]);
 
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -47,7 +44,6 @@ app.post("/submit-order", function(req, res) {
     order_id: crypto.createHash('md5').update("" + Date.now()).digest("hex") + Math.floor(Math.random() * 1000000000),
     chatting: false
   };
-//  order_database[req.body.dining_location].push(order);
 
   order_db.insert(order);
 
@@ -71,10 +67,6 @@ app.get("/show-orders", function(req, res) {
 app.get("/ajax-get-orders", function(req, res) {
   res.setHeader("Content-Type", "application/json");
 
-/*  orders = order_database[req.query.dining_location];
-  if (orders)
-    orders = orders.filter(order => !chatting_orders[order.order_id]) */
-
   orders = order_db({ dining_location: req.query.dining_location, chatting: false }).get();
 
   res.send(JSON.stringify(orders));
@@ -97,7 +89,7 @@ io.on('connection', function(socket){
 
 io.on('connection', function(socket) {
   socket.on('chat message', function(data) {
-    console.log(JSON.strinigfy(data);
+    console.log(JSON.stringify(data));
     io.sockets.in(data.roomID).emit('message', data.msg);
   });
 

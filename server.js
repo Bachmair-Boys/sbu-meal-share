@@ -7,9 +7,6 @@ var http = require('http').Server(app);
 var io = require('socket.io')(http);
 var TAFFY = require('taffy');
 
-var order_database = {};
-var chatting_orders = {};
-
 var order_db = TAFFY([]);
 
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -36,8 +33,6 @@ app.post("/submit-order", function(req, res) {
   console.log(req.body.dining_location);
   console.log(req.body.pickup_location);
   console.log(req.body.payment);
-/*  if (order_database[req.body.dining_location] == undefined)
-    order_database[req.body.dining_location] = []; */
 
   order = {
     dining_location: req.body.dining_location,
@@ -47,7 +42,6 @@ app.post("/submit-order", function(req, res) {
     order_id: crypto.createHash('md5').update("" + Date.now()).digest("hex") + Math.floor(Math.random() * 1000000000),
     chatting: false
   };
-//  order_database[req.body.dining_location].push(order);
 
   order_db.insert(order);
 
@@ -70,10 +64,6 @@ app.get("/show-orders", function(req, res) {
 
 app.get("/ajax-get-orders", function(req, res) {
   res.setHeader("Content-Type", "application/json");
-
-/*  orders = order_database[req.query.dining_location];
-  if (orders)
-    orders = orders.filter(order => !chatting_orders[order.order_id]) */
 
   orders = order_db({ dining_location: req.query.dining_location, chatting: false }).get();
 
