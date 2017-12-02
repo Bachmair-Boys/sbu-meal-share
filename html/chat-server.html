@@ -1,6 +1,8 @@
 <!doctype html>
 <html>
   <head>
+      <link rel="stylesheet" href="css/bootstrap.min.css">
+      <script src="js/bootstrap.min.js"></script>
     <title>Meal Share Chat</title>
     <style>
       * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -13,12 +15,19 @@
       #messages li:nth-child(odd) { background: #eee; }
     </style>
   </head>
+
+  <header>
+      <nav class="navbar sticky-top navbar-light bg-light">
+        <a class="navbar-brand" href="/">Meal Share</a>
+      </nav>
+    </header>
+
   <body>
     <h3 id='room'></h3>
-    <h3 id='waiting'></h3>
+    <h3 align="center" id='waiting'></h3>
     <ul id="messages"></ul>
-    <form id="msg" action="">
-      <input id="m" autocomplete="off" /><button id="send">Send</button>
+    <form class="form-inline" id="msg" action="">
+        <input class="form-control col" width="auto" type="text" id="m" autocomplete="off"><button class="btn btn-success" id="send">Send</button>
     </form>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.4/socket.io.js"></script>
     <script src="/socket.io/socket.io.js"></script>
