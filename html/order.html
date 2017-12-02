@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="description" content="MealShare">
+    <meta name="author" content="CS 150">
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <script src="js/bootstrap.min.js"></script>
+  </head>
+  <body>
+    <script src="js/index.js"></script>
+    <h1>Check in </h1>
+      <form action="submit-order" method="POST">
+        <div class="form-group">
+          <label for="name_input">Name</label>
+          <input type="text" name="name" class="form-control" id="name_input">
+
+
+          <label for="dining_location_input">Dining Location</label>
+          <select class="form-control custom-select" name="dining_location" id="dining_location_input">
+            <option selected>East Side Dining</option>
+            <option>West Side Dining</option>
+            <option>Roth Cafe</option>
+            <option>Jasmine</option>
+            <option>Student Activities Center</option>
+          </select>
+
+          <label for="pickup_location_input">Pick-Up Location</label>
+          <input type="text" name="pickup_location" id="pickup_location_input" class="form-control">
+
+          <label for="payment_input">Payment Amount</label>
+          <input type="text" name="payment" id="payment_input" class="form-control">
+
+          <button class="btn btn-primary" type="submit">Order</button>
+  </body>
+</html>
