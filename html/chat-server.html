@@ -1,7 +1,7 @@
 <!doctype html>
 <html>
   <head>
-    <title>Socket.IO chat</title>
+    <title>Meal Share Chat</title>
     <style>
       * { margin: 0; padding: 0; box-sizing: border-box; }
       body { font: 13px Helvetica, Arial; }
@@ -59,6 +59,8 @@
 
       $(function () {
         var socket = io.connect();
+        socket.userType = get("userType");
+
         $('form').submit(function(){
           socket.emit('chat message', {
             "roomID": get("roomID"),
@@ -69,7 +71,7 @@
         });
 
         socket.on('connect', function(){
-            socket.emit('room',get('roomID'));
+            socket.emit('room', { "room": get('roomID'), "type": get("userType") });
             socket.emit('user_joined', {
               "type": get("userType"),
               "roomID": get("roomID")

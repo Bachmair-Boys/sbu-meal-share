@@ -87,7 +87,7 @@ app.get("/ajax-get-check-ins", function(req, res) {
 io.on('connection', function(socket){
   console.log('a user connected');
   socket.on('disconnect', function(){
-    console.log('user disconnected: ' + this.room);
+    console.log('user disconnected: ' + this.room + this.type);
     io.sockets.in(this.room).emit('user_disconnected', "true");
   });
 });
@@ -109,10 +109,12 @@ io.on('connection', function(socket){
 
 io.sockets.on('connection', function(socket) {
     // once a client has connected, we expect to get a ping from them saying what room they want to join
-    socket.on('room', function(roomID) {
-    	socket.room= roomID;
-    	console.log(roomID);
-        socket.join(roomID);
+    socket.on('room', function(data) {
+      console.log(data);
+      socket.type = data.type;
+    	socket.room = data.room;
+    	console.log(data.room);
+        socket.join(data.room);
     });
 });
 
