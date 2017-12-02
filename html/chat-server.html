@@ -12,7 +12,8 @@
       form button { width: 9%; background: rgb(130, 224, 255); border: none; padding: 10px; }
       #messages { list-style-type: none; margin: 0; padding: 0; }
       #messages li { padding: 5px 10px; }
-      #messages li:nth-child(odd) { background: #eee; }
+      #messages li.orderer { background: #eee; }
+      #messages li.deliverer { background: #FFFFFF; }
     </style>
   </head>
 
@@ -73,7 +74,7 @@
         $('form').submit(function(){
           socket.emit('chat message', {
             "roomID": get("roomID"),
-            "msg": $('#m').val()
+            "msg": '<li class="'+socket.userType+'">'+$('#m').val()+'</li>'
           });
           $('#m').val('');
           return false;
@@ -94,7 +95,8 @@
             userJoined();
         });
         socket.on('message', function(msg){
-          $('#messages').append($('<li>').text(msg));
+
+          $('#messages').append($(msg));
           window.scrollTo(0, document.body.scrollHeight);
         });
 
