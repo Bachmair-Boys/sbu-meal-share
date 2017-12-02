@@ -85,7 +85,7 @@ app.get("/ajax-get-orders", function(req, res) {
 io.on('connection', function(socket){
   console.log('a user connected');
   socket.on('disconnect', function(){
-    console.log('user disconnected: ' + this.room);
+    console.log('user disconnected: ' + this.room + this.type);
     io.sockets.in(this.room).emit('user_disconnected', "true");
   });
 });
@@ -101,16 +101,17 @@ io.on('connection', function(socket){
   socket.on('user_joined', function(data){
   	console.log('RoomID: '+data.roomID+"; Type: "+data.type);
   	io.sockets.in(data.roomID).emit('user_joined', data.type);
+
   });
 
 });
 
 io.sockets.on('connection', function(socket) {
     // once a client has connected, we expect to get a ping from them saying what room they want to join
-    socket.on('room', function(roomID) {
-    	socket.room= roomID;
-    	console.log(roomID);
-        socket.join(roomID);
+    socket.on('room', function(data) {
+      socket.type = data.type;
+    	socket.room= data.room;
+        socket.join(data.room);
     });
 });
 
