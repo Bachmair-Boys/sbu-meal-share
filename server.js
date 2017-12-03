@@ -25,7 +25,7 @@ app.get("/order", function(req, res) {
 });
 
 app.post("/submit-check-in", function(req, res) {
-  res.redirect("/show-orders?dining_location=" + req.body.dining_location);
+  res.redirect("/show-orders?dining_location=" + encodeURIComponent(req.body.dining_location) + "&name=" + encodeURICOmponent(req.body.name);
 });
 
 app.post("/submit-order", function(req, res) {
@@ -45,7 +45,7 @@ app.post("/submit-order", function(req, res) {
 
   order_db.insert(order);
 
-  res.redirect("/chat-with-deliverer?roomID=" + order.order_id + "&userType=orderer");
+  res.redirect("/chat-with-deliverer?roomID=" + order.order_id + "&userType=orderer&name=" + encodeURIComponent(req.body.name));
 });
 
 app.get("/chat-with-deliverer", function(req, res) {
@@ -88,7 +88,12 @@ io.on('connection', function(socket){
 io.on('connection', function(socket) {
   socket.on('chat message', function(data) {
     console.log(JSON.stringify(data));
+    if(order_db.select("order_id").count()!=0){
     io.sockets.in(data.roomID).emit('message', data.msg);
+  }
+  else{
+    io.sockets.in(data.roomID).emit('message', 'Chat Expired, please fill out a new order form.');
+  }
   });
 
   socket.on('user_joined', function(data){
