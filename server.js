@@ -88,12 +88,12 @@ io.on('connection', function(socket){
 io.on('connection', function(socket) {
   socket.on('chat message', function(data) {
     console.log(JSON.stringify(data));
-    if(order_db.select("order_id").count()!=0){
+    //if(order_db.select("order_id").count()!=0){
     io.sockets.in(data.roomID).emit('message', data.msg);
-  }
-  else{
-    io.sockets.in(data.roomID).emit('message', 'Chat Expired, please fill out a new order form.');
-  }
+  // }
+  // else{
+  //   io.sockets.in(data.roomID).emit('message', 'Chat Expired, please fill out a new order form.');
+  // }
   });
 
   socket.on('user_joined', function(data){
