@@ -13,8 +13,8 @@
       form button { width: 9%; background: rgb(130, 224, 255); border: none; padding: 10px; }
       #messages { list-style-type: none; margin: 0; padding: 0; }
       #messages li { padding: 5px 10px; }
-      #messages li.orderer { background: #eee; }
-      #messages li.deliverer { background: #FFFFFF; }
+      #messages li.orderer { text-align: right}
+      #messages li.deliverer { text-align: left}
     </style>
   </head>
 
@@ -73,9 +73,15 @@
         socket.userType = get("userType");
 
         $('form').submit(function(){
+          var divClass = "card mb-3 w-100";
+          if(socket.userType === "deliverer")
+            divClass += "  bg-primary text-white";
+          else
+            divClass += "  bg-light";
+
           socket.emit('chat message', {
             "roomID": get("roomID"),
-            "msg": '<li class="'+socket.userType+'">'+$('#m').val()+'</li>'
+            "msg": '<li class="'+socket.userType+'"><div class="'+divClass+'"><div class="card-body"><p class="card-text">'+$('#m').val()+'</p></li>'
           });
           $('#m').val('');
           return false;
@@ -87,6 +93,8 @@
               "type": get("userType"),
               "roomID": get("roomID")
             });
+            if(get('userType') === "deliverer")
+              $( "<style>#messages li.orderer { text-align: left} #messages li.deliverer { text-align: right}</style>" ).appendTo( "head" );
         });
         socket.on('user_joined', function(type){
             console.log('userJoined');
