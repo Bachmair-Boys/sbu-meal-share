@@ -48,6 +48,8 @@
             delivererJoined = true;
             document.getElementById('waiting').innerHTML = '';
             document.getElementById('send').disabled = false;
+            $("ul").empty();
+            $('<li><div class="alert alert-info" role="alert"> You are chatting with </div></li>').insertAfter('#waiting');
 
          }
          else{
