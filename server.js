@@ -25,7 +25,7 @@ app.get("/order", function(req, res) {
 });
 
 app.post("/submit-check-in", function(req, res) {
-  res.redirect("/show-orders?dining_location=" + encodeURIComponent(req.body.dining_location) + "&name=" + encodeURICOmponent(req.body.name);
+  res.redirect("/show-orders?dining_location=" + encodeURIComponent(req.body.dining_location) + "&name=" + encodeURIComponent(req.body.name));
 });
 
 app.post("/submit-order", function(req, res) {
