@@ -90,6 +90,7 @@
         socket.on('connect', function(){
             socket.emit('room', { "room": get('roomID'), "type": get("userType") });
             socket.emit('user_joined', {
+              "name": get("name"),
               "type": get("userType"),
               "roomID": get("roomID")
             });
@@ -110,8 +111,10 @@
         });
 
         socket.on('name', function(name){
+          console.log(name + " " + get("name"));
             if(name != get("name")){
-                $('<li><div class="alert alert-info" role="alert"> You are chatting with </div></li>').insertAfter('#waiting');
+                $('<div class="alert alert-info" role="alert"> You are chatting with ' + name + ' </div>').insertAfter('#waiting');
+
             }
         });
 
