@@ -49,8 +49,6 @@
             document.getElementById('waiting').innerHTML = '';
             document.getElementById('send').disabled = false;
             $("ul").empty();
-            $('<li><div class="alert alert-info" role="alert"> You are chatting with </div></li>').insertAfter('#waiting');
-
          }
          else{
             document.getElementById('waiting').innerHTML = 'Please wait for a deliverer to take your order.';
@@ -109,6 +107,12 @@
 
           $('#messages').append($(msg));
           window.scrollTo(0, document.body.scrollHeight);
+        });
+
+        socket.on('name', function(name){
+            if(name != get("name")){
+                $('<li><div class="alert alert-info" role="alert"> You are chatting with </div></li>').insertAfter('#waiting');
+            }
         });
 
         // socket.on("disconnect", function(){

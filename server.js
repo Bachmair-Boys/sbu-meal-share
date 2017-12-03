@@ -99,7 +99,7 @@ io.on('connection', function(socket) {
   socket.on('user_joined', function(data){
     console.log(JSON.stringify(data));
   	io.sockets.in(data.roomID).emit('user_joined', data.type);
-
+    io.sockets.in(data.roomID).emit('name', data.name);
   });
 });
 
