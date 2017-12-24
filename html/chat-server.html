@@ -1,135 +1,27 @@
-<!doctype html>
+<!DOCTYPE html>
 <html>
   <head>
-      <link rel="stylesheet" href="css/bootstrap.min.css">
-      <script src="js/bootstrap.min.js"></script>
-      <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/chat-server.css">
+    <script src="js/jquery-3.2.1.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="js/chat-server.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Meal Share Chat</title>
-    <style>
-      * { margin: 0; padding: 0; box-sizing: border-box; }
-      body { font: 13px Helvetica, Arial; }
-      form { background: #000; padding: 3px; position: fixed; bottom: 0; width: 100%; }
-      form input { border: 0; padding: 10px; width: 90%; margin-right: .5%; }
-      form button { width: 9%; background: rgb(130, 224, 255); border: none; padding: 10px; }
-      #messages { list-style-type: none; margin: 0; padding: 0; }
-      #messages li { padding: 5px 10px; }
-      #messages li.orderer { text-align: right}
-      #messages li.deliverer { text-align: left}
-    </style>
   </head>
-
   <header>
-      <nav class="navbar sticky-top navbar-light bg-light">
-        <a class="navbar-brand" href="/">Meal Share</a>
-      </nav>
-    </header>
+    <nav class="navbar sticky-top navbar-light bg-light">
+      <a class="navbar-brand" href="/">Meal Share</a>
+    </nav>
+  </header>
 
   <body>
-    <h3 id='room'></h3>
-    <h3 align="center" id='waiting'></h3>
+    <h3 id='waiting'></h3>
     <ul id="messages"></ul>
     <form class="form-inline" id="msg" action="">
-        <input class="form-control col-11" width="auto" type="text" id="m" autocomplete="off"><button class="btn btn-success col" id="send">Send</button>
-    </form>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.4/socket.io.js"></script>
-    <script src="/socket.io/socket.io.js"></script>
-    <script src="https://code.jquery.com/jquery-1.11.1.js"></script>
-    <script>
-      var room;
-      var delivererJoined;
-      var ordererJoined;
-      function get(name){
-         if(name=(new RegExp('[?&]'+encodeURIComponent(name)+'=([^&]*)')).exec(location.search))
-            return decodeURIComponent(name[1]);
-      }
-      function userJoined(){
-         var type = get("userType");
-         if(type==='deliverer' || delivererJoined){
-            delivererJoined = true;
-            document.getElementById('waiting').innerHTML = '';
-            document.getElementById('send').disabled = false;
-            $("ul").empty();
-         }
-         else{
-            document.getElementById('waiting').innerHTML = 'Please wait for a deliverer to take your order.';
-            document.getElementById('send').disabled = true;
-         }
-      }
-
-      function userLeft(){
-        var type = get("userType");
-        if(type==='deliverer'){
-          document.getElementById('waiting').innerHTML = 'The orderer has left the chat.';
-          document.getElementById('send').disabled = true;
-        }
-        else if(type === 'orderer'){
-          document.getElementById('waiting').innerHTML = 'The deliverer has left the chat. Please wait for a deliverer to take your order.';
-          document.getElementById('send').disabled = true;
-        }
-      }
-
-      $(function () {
-        var socket = io.connect();
-        socket.userType = get("userType");
-
-        $('form').submit(function(){
-          var divClass = "card mb-3 w-100";
-          if(socket.userType === "deliverer")
-            divClass += "  bg-primary text-white";
-          else
-            divClass += "  bg-light";
-
-          socket.emit('chat message', {
-            "roomID": get("roomID"),
-            "msg": '<li class="'+socket.userType+'"><div class="'+divClass+'"><div class="card-body"><p class="card-text">'+$('#m').val()+'</p></li>'
-          });
-          $('#m').val('');
-          return false;
-        });
-
-        socket.on('connect', function(){
-            socket.emit('room', { "room": get('roomID'), "type": get("userType") });
-            socket.emit('user_joined', {
-              "name": get("name"),
-              "type": get("userType"),
-              "roomID": get("roomID")
-            });
-            if(get('userType') === "deliverer")
-              $( "<style>#messages li.orderer { text-align: left} #messages li.deliverer { text-align: right}</style>" ).appendTo( "head" );
-        });
-        socket.on('user_joined', function(type){
-            console.log('userJoined');
-            if(type === "deliverer"){
-              delivererJoined = true;
-            }
-            userJoined();
-        });
-        socket.on('message', function(msg){
-
-          $('#messages').append($(msg));
-          window.scrollTo(0, document.body.scrollHeight);
-        });
-
-        socket.on('name', function(name){
-          console.log(name + " " + get("name"));
-            if(name != get("name")){
-                $('<div class="alert alert-info" role="alert"> You are chatting with ' + name + ' </div>').insertAfter('#waiting');
-
-            }
-        });
-
-        // socket.on("disconnect", function(){
-        //   socket.emit('user_disconnected', {
-        //     "type": get("userType"),
-        //     "roomID": get("roomID")
-        //   });
-        //   console.log('USER DISCONNECTED')
-        // });
-
-        socket.on("user_disconnected", function(type){
-            userLeft();
-        });
-      });
-    </script>
+      <input class="form-control col-11" width="auto" type="text" id="m" autocomplete="off">
+      <button class="btn btn-success col" id="send">Send</button>
+  </form>
   </body>
 </html>

@@ -15,7 +15,7 @@ setInterval(function () {
         orders[i].payment + "</p></div>");
       var card = $("<div class='card'>");
       var button = $("<a class='btn btn-primary' href='/chat-with-orderer?roomID=" + orders[i].order_id + 
-        "&userType=deliverer&name=" + get("name") + "'>Chat</a>");
+        "&userRole=deliverer&name=" + get("name") + "'>Chat</a>");
                   
       card_body.append(button);
       card.append(card_header);

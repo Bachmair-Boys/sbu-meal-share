@@ -29,10 +29,10 @@ app.post("/submit-check-in", function(req, res) {
 });
 
 app.post("/submit-order", function(req, res) {
-  console.log(req.body.name);
-  console.log(req.body.dining_location);
-  console.log(req.body.pickup_location);
-  console.log(req.body.payment);
+//  console.log(req.body.name);
+//  console.log(req.body.dining_location);
+//  console.log(req.body.pickup_location);
+//  console.log(req.body.payment);
 
   order = {
     dining_location: req.body.dining_location,
@@ -45,7 +45,7 @@ app.post("/submit-order", function(req, res) {
 
   order_db.insert(order);
 
-  res.redirect("/chat-with-deliverer?roomID=" + order.order_id + "&userType=orderer&name=" + encodeURIComponent(req.body.name));
+  res.redirect("/chat-with-deliverer?roomID=" + order.order_id + "&userRole=orderer&name=" + encodeURIComponent(req.body.name));
 });
 
 app.get("/chat-with-deliverer", function(req, res) {
@@ -53,7 +53,7 @@ app.get("/chat-with-deliverer", function(req, res) {
 });
 
 app.get("/chat-with-orderer", function(req, res) {
-  console.log(req.body.order_id);
+  console.log("56: " + req.body.order_id);
   order_db({order_id: req.body.order_id}).update({chatting: true});
   res.sendFile(__dirname + "/html/chat-server.html");
 });
@@ -74,9 +74,9 @@ app.get("/ajax-get-orders", function(req, res) {
 io.on('connection', function(socket){
   console.log('a user connected');
   socket.on('disconnect', function(){
-    console.log('user disconnected: ' + this.room + this.type);
+    console.log('user disconnected: ' + this.room + this.userRole);
     order = order_db({ order_id: this.room });
-    if (this.type == "orderer")
+    if (this.userRole == "orderer")
       order.remove();
     else
       order.update({ chatting: false });
@@ -87,18 +87,13 @@ io.on('connection', function(socket){
 
 io.on('connection', function(socket) {
   socket.on('chat message', function(data) {
-    console.log(JSON.stringify(data));
-    //if(order_db.select("order_id").count()!=0){
+    console.log("90: " + JSON.stringify(data));
     io.sockets.in(data.roomID).emit('message', data.msg);
-  // }
-  // else{
-  //   io.sockets.in(data.roomID).emit('message', 'Chat Expired, please fill out a new order form.');
-  // }
   });
 
-  socket.on('user_joined', function(data){
-    console.log(JSON.stringify(data));
-  	io.sockets.in(data.roomID).emit('user_joined', data.type);
+  socket.on('user_joined', function(data) {
+    console.log("95: " + JSON.stringify(data));
+  	io.sockets.in(data.roomID).emit('user_joined', data.userRole);
     io.sockets.in(data.roomID).emit('name', data.name);
   });
 });
@@ -107,11 +102,11 @@ io.sockets.on('connection', function(socket) {
     // once a client has connected, we expect to get a ping from them saying what room they want to join
     socket.on('room', function(data) {
 
-      if (data.type == "deliverer") 
+      if (data.userRole == "deliverer") 
         order_db({order_id: data.room}).update({chatting: true});
 
-      socket.type = data.type;
-    	socket.room= data.room;
+      socket.userRole = data.userRole;
+    	socket.room = data.room;
       socket.join(data.room);
     });
 });
