@@ -37,14 +37,14 @@ $(function () {
     socket.on('deliverer_name', function(name) {
       $("#chatting-with").html("You are chatting with " + name + ".");
       $("#chatting-with").css("visibility", "visible");
-      $("#waiting").html('');
+      $("#waiting").css("display", "none");
       $("#send").prop('disabled', false);
       $("ul").empty();
 
       socket.emit("orderer_name", { roomID: roomID, name: get("name") });
     });
   } else if (userRole === "deliverer") { 
-    $("#waiting").html('');
+    $("#waiting").css("display", "none");
     $("#send").prop('disabled', false);
 
     socket.on('orderer_name', function(name) {
@@ -77,9 +77,11 @@ $(function () {
     $("#send").prop('disabled', true);
     $("#chatting-with").css("visibility", "hidden");
     if (userRole === 'deliverer')
-      $("#waiting").html("The orderer has left the chat.");
+      $("#waiting").html("The orderer has left the chat.").css('display', 'block');
     else if (userRole === 'orderer')
-      $("#waiting").html('The deliverer has left the chat. Please wait for a deliverer to take your order.');
+      $("#waiting")
+        .html('The deliverer has left the chat. Please wait for a deliverer to take your order.')
+        .css('display', 'block');
   });
   
   $('form').submit(function(){
