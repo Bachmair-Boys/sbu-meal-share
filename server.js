@@ -29,11 +29,6 @@ app.post("/submit-check-in", function(req, res) {
 });
 
 app.post("/submit-order", function(req, res) {
-//  console.log(req.body.name);
-//  console.log(req.body.dining_location);
-//  console.log(req.body.pickup_location);
-//  console.log(req.body.payment);
-
   order = {
     dining_location: req.body.dining_location,
     name: req.body.name,
@@ -53,7 +48,6 @@ app.get("/chat-with-deliverer", function(req, res) {
 });
 
 app.get("/chat-with-orderer", function(req, res) {
-  console.log("56: " + req.body.order_id);
   order_db({order_id: req.body.order_id}).update({chatting: true});
   res.sendFile(__dirname + "/html/chat-server.html");
 });
@@ -72,7 +66,6 @@ app.get("/ajax-get-orders", function(req, res) {
 });
 
 io.on('connection', function(socket){
-  console.log('a user connected');
   socket.on('disconnect', function(){
     console.log('user disconnected: ' + this.room + this.userRole);
     order = order_db({ order_id: this.room });
@@ -87,12 +80,10 @@ io.on('connection', function(socket){
 
 io.on('connection', function(socket) {
   socket.on('chat message', function(data) {
-    console.log("90: " + JSON.stringify(data));
-    io.sockets.in(data.roomID).emit('message', data.msg);
+    io.sockets.in(data.roomID).emit('message', { message: data.message, from: data.from });
   });
 
   socket.on('user_joined', function(data) {
-    console.log("95: " + JSON.stringify(data));
   	io.sockets.in(data.roomID).emit('user_joined', data.userRole);
     io.sockets.in(data.roomID).emit('name', data.name);
   });

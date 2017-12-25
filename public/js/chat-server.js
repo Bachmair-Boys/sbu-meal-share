@@ -1,13 +1,31 @@
 "use strict"
-var delivererJoined;
-var ordererJoined;
+const entityMap = {
+  '&': '&amp;',
+  '<': '&lt;',
+  '>': '&gt;',
+  '"': '&quot;',
+  "'": '&#39;',
+  '/': '&#x2F;',
+  '`': '&#x60;',
+  '=': '&#x3D;'
+};
+
+function escapeHTML(string) {
+  return String(string).replace(/[&<>"'`=\/]/g, function (s) {
+    return entityMap[s];
+  });
+}
+
 function get(name){
   if(name=(new RegExp('[?&]'+encodeURIComponent(name)+'=([^&]*)')).exec(location.search))
     return decodeURIComponent(name[1]);
 }
 
-function userJoined(){
-  const userRole = get("userRole");
+var delivererJoined;
+var ordererJoined;
+const userRole = get("userRole");
+
+function userJoined() {
   if (userRole === 'deliverer' || delivererJoined) {
     delivererJoined = true;
     $("#waiting").html('');
@@ -19,9 +37,9 @@ function userJoined(){
   }
 }
 
-function userLeft(){
-  const userRole = get("userRole");
+function userLeft() {
   $("#send").prop('disabled', true);
+  $("#chatting-with").css("visibility", "hidden");
   if (userRole === 'deliverer')
     $("#waiting").html("The orderer has left the chat.");
   else if (userRole === 'orderer')
@@ -30,55 +48,70 @@ function userLeft(){
 
 $(function () {
   const socket = io.connect();
-  socket.userRole = get("userRole");
+  socket.userRole = userRole;
 
   $('form').submit(function(){
-    var divClass = "card mb-3 w-100";
-    if(socket.userRole === "deliverer")
-      divClass += "  bg-primary text-white";
-    else
-      divClass += "  bg-light";
+    // Only do something if the message isn't empty
+    if ($("#message_text").val() !== "") {
+      const message = $("<li></li>");
+      const cardDiv = $("<div></div>").addClass("card mb-3 w-100");
 
-    socket.emit('chat message', {
-      "roomID": get("roomID"),
-      "msg": '<li class="'+socket.userRole+'"><div class="'+divClass+'"><div class="card-body"><p class="card-text">'+$('#m').val()+'</p></li>'
-    });
-    $('#m').val('');
+      const cardBody = $("<div></div>").addClass("card-body");
+      const cardText = $("<p></p>").addClass("card-text").html(escapeHTML($("#message_text").val()));
+
+      message.append(cardDiv.append(cardBody.append(cardText)));
+      console.log(message[0].outerHTML);
+
+      const messageHTML = message[0].outerHTML;
+      cardDiv.addClass("bg-primary text-white");
+      message.addClass("sent");
+      $("#messages").append(message);
+        
+      socket.emit('chat message', {
+        "roomID": get("roomID"),
+        "message": messageHTML,
+        "from": userRole
+      });
+      $('#message_text').val('');
+    }
     return false;
   });
 
-  socket.on('connect', function(){
+  socket.on('connect', function() {
     socket.emit('room', { "room": get('roomID'), "userRole": get("userRole") });
     socket.emit('user_joined', {
       "name": get("name"),
       "userRole": get("userRole"),
       "roomID": get("roomID")
     });
-    if(get('userRole') === "deliverer")
-      $( "<style>#messages li.orderer { text-align: left} #messages li.deliverer { text-align: right}</style>" ).appendTo( "head" );
   });
-  socket.on('user_joined', function(userRole){
+
+  socket.on('user_joined', function(userRole) {
     console.log('userJoined: ' + userRole);
-    if(userRole === "deliverer"){
+    if(userRole === "deliverer") {
       delivererJoined = true;
     }
     userJoined();
   });
-  socket.on('message', function(msg){
 
-    $('#messages').append($(msg));
-    window.scrollTo(0, document.body.scrollHeight);
-  });
+  socket.on('message', function(data) {
+    if (data.from !== userRole) {
+      const message = $(data.message).addClass("received");
+      message.filter(":first-child").addClass("bg-light");
 
-  socket.on('name', function(name){
-    console.log(name + " " + get("name"));
-    if(name != get("name")){
-      $('<div class="alert alert-info" role="alert"> You are chatting with ' + name + ' </div>').insertAfter('#waiting');
-
+      $('#messages').append(message);
+      window.scrollTo(0, document.body.scrollHeight);
     }
   });
 
-  socket.on("user_disconnected", function(userRole){
+  socket.on('name', function(name) {
+    if(name != get("name")){
+      $("#chatting-with").html("You are chatting with " + name + ".");
+      $("#chatting-with").css("visibility", "visible");
+    }
+  });
+
+  socket.on("user_disconnected", function(userRole) {
     userLeft();
   });
 });
