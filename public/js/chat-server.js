@@ -73,7 +73,7 @@ $(function () {
     }
   });
 
-  socket.on("user_disconnected", function(userRole) {
+  socket.on("user_disconnected", function() {
     $("#send").prop('disabled', true);
     $("#chatting-with").css("visibility", "hidden");
     if (userRole === 'deliverer')

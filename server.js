@@ -1,31 +1,28 @@
 const express = require("express");
 const app = express();
-var bodyParser = require("body-parser");
-var path = require("path");
-var crypto = require("crypto");
-var http = require('http').Server(app);
-var io = require('socket.io')(http);
-var TAFFY = require('taffy');
+const bodyParser = require("body-parser");
+const path = require("path");
+const crypto = require("crypto");
+const http = require('http').Server(app);
+const io = require('socket.io')(http);
+const TAFFY = require('taffy');
 
-var order_db = TAFFY([]);
+const order_db = TAFFY([]);
 
+// Setup publicly accessible files
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, "public")));
 
 app.get("/", function(req, res) {
-  res.sendFile(path.join(__dirname + "/html/index.html"));
+  res.sendFile(__dirname + "/html/index.html");
 });
 
-app.get("/check-in", function(req, res) {
-  res.sendFile(path.join(__dirname + "/html/check-in.html"));
-});
 
-app.get("/order", function(req, res) {
-  res.sendFile(path.join(__dirname + "/html/order.html"));
-});
-
+// Setup interactive part of app
 app.post("/submit-check-in", function(req, res) {
-  res.redirect("/show-orders?dining_location=" + encodeURIComponent(req.body.dining_location) + "&name=" + encodeURIComponent(req.body.name));
+  res.redirect("/html/show-orders.html?dining_location=" + 
+    encodeURIComponent(req.body.dining_location) + 
+    "&name=" + encodeURIComponent(req.body.name));
 });
 
 app.post("/submit-order", function(req, res) {
@@ -52,10 +49,6 @@ app.get("/chat-with-orderer", function(req, res) {
   res.sendFile(__dirname + "/html/chat-server.html");
 });
 
-app.get("/show-orders", function(req, res) {
-  res.sendFile(path.join(__dirname + "/html/show-orders.html"));
-});
-
 app.get("/ajax-get-orders", function(req, res) {
   res.setHeader("Content-Type", "application/json");
 
@@ -65,48 +58,43 @@ app.get("/ajax-get-orders", function(req, res) {
   res.end();
 });
 
-io.on('connection', function(socket){
-  socket.on('disconnect', function(){
-    console.log('user disconnected: ' + this.room + this.userRole);
-    order = order_db({ order_id: this.room });
-    if (this.userRole == "orderer")
-      order.remove();
-    else
-      order.update({ chatting: false });
-
-    io.sockets.in(this.room).emit('user_disconnected', "true");
-  });
-});
-
+// Setup chat server
 io.on('connection', function(socket) {
   socket.on('chat_message', function(data) {
     io.sockets.in(data.roomID).emit('message', { message: data.message, from: data.from });
   });
 
   socket.on('deliverer_name', function(data) {
-  	io.sockets.in(data.roomID).emit('deliverer_name', data.name);
+    io.sockets.in(data.roomID).emit('deliverer_name', data.name);
   });
 
   socket.on('orderer_name', function(data) {
     io.sockets.in(data.roomID).emit('orderer_name', data.name)
   });
+
+  socket.on('disconnect', function() {
+    order = order_db({ order_id: this.room });
+    if (this.userRole == "orderer")
+      order.remove();
+    else
+      order.update({ chatting: false });
+
+    io.sockets.in(this.room).emit('user_disconnected');
+  });
 });
 
 io.sockets.on('connection', function(socket) {
-    // once a client has connected, we expect to get a ping from them saying what room they want to join
-    socket.on('room', function(data) {
+  // once a client has connected, we expect to get a ping from them saying what room they want to join
+  socket.on('room', function(data) {
+    if (data.userRole == "deliverer") 
+      order_db({order_id: data.room}).update({chatting: true});
 
-      if (data.userRole == "deliverer") 
-        order_db({order_id: data.room}).update({chatting: true});
-
-      socket.userRole = data.userRole;
-    	socket.room = data.room;
-      socket.join(data.room);
-    });
+    socket.userRole = data.userRole;
+    socket.room = data.room;
+    socket.join(data.room);
+  });
 });
 
-http.listen(process.env.PORT || 5000, function(){
+http.listen(process.env.PORT || 5000, function() {
   console.log('listening on: ' + (process.env.PORT || 5000));
 });
-
-
