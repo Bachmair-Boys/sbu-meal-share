@@ -85,19 +85,16 @@ $(function () {
   $('form').submit(function(){
     // Only do something if the message isn't empty
     if ($("#message_text").val() !== "") {
-      const message = $("<li></li>");
-      const cardDiv = $("<div></div>").addClass("card mb-3 w-100");
-
+      const cardDiv = $("<div></div>").addClass("card mb-3");
       const cardBody = $("<div></div>").addClass("card-body");
       const cardText = $("<p></p>").addClass("card-text").html(escapeHTML($("#message_text").val()));
 
-      message.append(cardDiv.append(cardBody.append(cardText)));
-      console.log(message[0].outerHTML);
+      cardDiv.append(cardBody.append(cardText));
 
-      const messageHTML = message[0].outerHTML;
+      const messageHTML = cardDiv[0].outerHTML;
       cardDiv.addClass("bg-primary text-white");
-      message.addClass("sent");
-      $("#messages").append(message);
+      cardDiv.addClass("sent");
+      $("#messages").append(cardDiv);
         
       socket.emit('chat_message', {
         roomID: roomID,

@@ -19,10 +19,14 @@
   <body>
     <h3 id='waiting'></h3>
     <div class="alert alert-info" role="alert" id="chatting-with"></div>
-    <ul id="messages"></ul>
-    <form class="form-inline" id="msg" action="">
-      <input class="form-control col-11" width="auto" type="text" id="message_text" autocomplete="off">
-      <button class="btn btn-success col" id="send">Send</button>
+    <div id="messages"></div>
+    <form id="msg" action="">
+      <div class="input-group">
+          <input class="form-control"  type="text" id="message_text" autocomplete="off">
+          <span class="input-group-btn">
+            <button class="btn btn-success" id="send">Send</button>
+          </span>
+      </div>
   </form>
   </body>
 </html>
