@@ -79,13 +79,16 @@ io.on('connection', function(socket){
 });
 
 io.on('connection', function(socket) {
-  socket.on('chat message', function(data) {
+  socket.on('chat_message', function(data) {
     io.sockets.in(data.roomID).emit('message', { message: data.message, from: data.from });
   });
 
-  socket.on('user_joined', function(data) {
-  	io.sockets.in(data.roomID).emit('user_joined', data.userRole);
-    io.sockets.in(data.roomID).emit('name', data.name);
+  socket.on('deliverer_name', function(data) {
+  	io.sockets.in(data.roomID).emit('deliverer_name', data.name);
+  });
+
+  socket.on('orderer_name', function(data) {
+    io.sockets.in(data.roomID).emit('orderer_name', data.name)
   });
 });
 
