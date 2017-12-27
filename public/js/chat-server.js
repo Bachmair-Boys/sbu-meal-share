@@ -93,7 +93,7 @@ $(function () {
 
   socket.on("typing", function(data){
     if(data.userRole !== userRole){
-      $("#chatting-with").html("You are chatting with " + data.name + ". " + data.name  + " is typing...");
+      $("#chatting-with").html(data.name  + " is typing...");
     }
   });
 
