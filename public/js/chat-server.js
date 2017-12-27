@@ -2,6 +2,9 @@
 
 const userRole = get("userRole");
 const roomID = get("roomID");
+var typing = false;
+var timeout = undefined;
+const socket = io.connect();
 
 function escapeHTML(string) {
   const entityMap = {
@@ -25,9 +28,13 @@ function get(name){
     return decodeURIComponent(name[1]);
 }
 
+function onTimeout(){
+  typing = false;
+  socket.emit("stopped_typing",{ "room": get('roomID'), "userRole": userRole });
+}
+
 
 $(function () {
-  const socket = io.connect();
   socket.userRole = userRole;
 
   if (userRole === "orderer") {
@@ -83,6 +90,18 @@ $(function () {
         .html('The deliverer has left the chat. Please wait for a deliverer to take your order.')
         .css('display', 'block');
   });
+
+  socket.on("typing", function(role){
+    if(role !== userRole){
+      console.log('The other user is typing.');
+    }
+  });
+
+  socket.on("typing", function(role){
+    if(role !== userRole){
+      console.log('The other user stopped typing.');
+    }
+  });
   
   $('form').submit(function(){
     // Only do something if the message isn't empty
@@ -106,5 +125,20 @@ $(function () {
       $('#message_text').val('');
     }
     return false;
+  });
+
+  $("#message_text").keydown(function(event){
+      var keycode = event.keyCode || event.which;
+      if(keycode !== '13'){
+          if(typing === false){
+            typing = true;
+            socket.emit("typing",{ "room": get('roomID'), "userRole": userRole });
+            timeout = setTimeout(onTimeout, 3000);
+          }
+          else{
+            clearTimeout();
+            timeout = setTimeout(onTimeout, 3000);
+          }
+      }
   });
 });

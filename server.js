@@ -81,6 +81,12 @@ io.on('connection', function(socket) {
 
     io.sockets.in(this.room).emit('user_disconnected');
   });
+  socket.on('typing', function(data){
+    io.sockets.in(data.room).emit('typing',data.userRole);
+  });
+  socket.on('stopped_typing', function(data){
+    io.sockets.in(data.room).emit('stopped_typing',data.userRole);
+  });
 });
 
 io.sockets.on('connection', function(socket) {
