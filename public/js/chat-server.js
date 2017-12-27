@@ -4,7 +4,6 @@ const userRole = get("userRole");
 const roomID = get("roomID");
 var typing = false;
 var timeout = undefined;
-const socket = io.connect();
 
 function escapeHTML(string) {
   const entityMap = {
@@ -30,11 +29,12 @@ function get(name){
 
 function onTimeout(){
   typing = false;
-  socket.emit("stopped_typing",{ "room": get('roomID'), "userRole": userRole });
+  io.connect().emit("stopped_typing",{ "room": get('roomID'), "userRole": userRole, name: get("name") });
 }
 
 
 $(function () {
+  const socket = io.connect();
   socket.userRole = userRole;
 
   if (userRole === "orderer") {
@@ -91,15 +91,15 @@ $(function () {
         .css('display', 'block');
   });
 
-  socket.on("typing", function(role){
-    if(role !== userRole){
-      console.log('The other user is typing.');
+  socket.on("typing", function(data){
+    if(data.userRole !== userRole){
+      $("#chatting-with").html("You are chatting with " + data.name + ". " + data.name  + " is typing...");
     }
   });
 
-  socket.on("typing", function(role){
-    if(role !== userRole){
-      console.log('The other user stopped typing.');
+  socket.on("stopped_typing", function(data){
+    if(data.userRole !== userRole){
+      $("#chatting-with").html("You are chatting with " + data.name + ".");
     }
   });
   
@@ -129,15 +129,16 @@ $(function () {
 
   $("#message_text").keydown(function(event){
       var keycode = event.keyCode || event.which;
-      if(keycode !== '13'){
+      // Emit "is typing" message for any key pressed besides enter key.
+      if(keycode != 13){
           if(typing === false){
             typing = true;
-            socket.emit("typing",{ "room": get('roomID'), "userRole": userRole });
-            timeout = setTimeout(onTimeout, 3000);
+            socket.emit("typing",{ "room": get('roomID'), "userRole": userRole, name: get("name") });
+            timeout = setTimeout(onTimeout, 2000);
           }
           else{
-            clearTimeout();
-            timeout = setTimeout(onTimeout, 3000);
+            clearTimeout(timeout);
+            timeout = setTimeout(onTimeout, 2000);
           }
       }
   });
