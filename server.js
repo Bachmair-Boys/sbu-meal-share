@@ -25,6 +25,10 @@ app.post("/submit-check-in", function(req, res) {
     "&name=" + encodeURIComponent(req.body.name));
 });
 
+app.post("/menu", function(req, res) {
+  res.sendFile(__dirname + "/html/menu.html");
+});
+
 app.post("/submit-order", function(req, res) {
   order = {
     dining_location: req.body.dining_location,
@@ -100,6 +104,7 @@ io.sockets.on('connection', function(socket) {
     socket.join(data.room);
   });
 });
+
 
 http.listen(process.env.PORT || 5000, function() {
   console.log('listening on: ' + (process.env.PORT || 5000));

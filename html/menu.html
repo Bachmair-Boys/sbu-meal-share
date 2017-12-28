@@ -7,8 +7,9 @@
     <script src="js/bootstrap.min.js"></script>
     <script src="/socket.io/socket.io.js"></script>
     <script src="js/chat-server.js"></script>
+    <script src="js/menu-server.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Meal Share Chat</title>
+    <title>Menu Test</title>
   </head>
   <header>
     <nav class="navbar sticky-top navbar-light bg-light">
@@ -17,16 +18,13 @@
   </header>
 
   <body>
-    <div class="alert alert-warning" id='waiting'></div>
-    <div class="alert alert-info" role="alert" id="chatting-with"></div>
-    <div id="messages"></div>
-    <form id="msg" action="">
-      <div class="input-group">
-          <input class="form-control"  type="text" id="message_text" autocomplete="off">
-          <span class="input-group-btn">
-            <button class="btn btn-success" id="send" style="cursor:pointer">Send</button>
-          </span>
-      </div>
-  </form>
+    <h6>Select a Dining Location to see today's menu.</h6>
+    <select class="form-control custom-select" name="dining_location" id="dining_location_input">
+      <option value="Select">Select a Dining Location</option>
+      <option value="East+Side+Dine-In">East Side Dining</option>
+      <option value="West+Side+Dine+In">West Side Dining</option>
+      <option value="Roth+Food+Court">Roth Food Court</option>
+      <option value="SAC+Food+Court">Student Activities Center</option>
+    </select>
   </body>
 </html>
