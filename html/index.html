@@ -5,18 +5,26 @@
     <meta name="description" content="MealShare">
     <meta name="author" content="CS 150">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="/css/bootstrap.min.css">
-    <script src="/js/bootstrap.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.2.1.min.js"
+			      integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
+			      crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" 
+         integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+         crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.3/css/bootstrap.min.css" 
+          integrity="sha384-Zug+QiDoJOrZ5t4lssLdxGhVrurbmBWopoEl+M6BdEfwnCJZtKxi1KgxUyJq13dy" crossorigin="anonymous">
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.3/js/bootstrap.min.js" 
+            integrity="sha384-a5N7Y/aK3qNeh15eJKGWxsqtnX/wWdSZSKp+81YjTmS15nvnvxKHuzaWwXHDli+4" 
+            crossorigin="anonymous"></script>
   </head>
   <body>
-    <script src="/js/index.js"></script>
 
     <div class="text-center">
     <h1>SBU Meal Share</h1>
     <form action="/menu" method="POST">
     <a class="btn btn-primary " href="/html/check-in.html">Check in</a>
     <a class="btn btn-primary" href="/html/order.html">Order</a>
-      <button class="btn btn-primary" type="submit">Menus</button>
+    <a class="btn btn-primary" href="/html/menu.html">Menus</a>
     </form>
     <h6>Welcome to the SBU Meal Sharing Program! If you are currently at a dining location, please check in to see orders for that location. If you would like to order, fill out the Order form so we can link you with a deliverer.</h6>
     </div>

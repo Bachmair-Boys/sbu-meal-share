@@ -12,7 +12,7 @@ $(function () {
       dataType: "json",
       type: "GET",
       success: function(data){
-        //Clear existing data:
+        // Clear existing data:
         $("table").remove();
         $("#closed").remove();
         if(data.success == false){
@@ -26,7 +26,7 @@ $(function () {
   });
 });
 
-function createMenuTable(data){
+function createMenuTable(data) {
   var table = document.createElement("table");
   var head = document.createElement("thead");
   var menu_item = document.createElement("th");
@@ -37,18 +37,18 @@ function createMenuTable(data){
   head.append(menu_item);
   table.append(head);
   var periods = data.Periods;
-  for(i=0; i < periods.length; i++){
+  for(i=0; i < periods.length; i++) {
     var stations = periods[i].Stations;
-    for(j=0; j < stations.length; j++){
+    for(j=0; j < stations.length; j++) {
       var items = stations[j].MenuItems;
-      for(k=0; k < items.length; k++){
+      for(k=0; k < items.length; k++) {
         var row = document.createElement("tr");
         var name = document.createElement("td");
         name.innerHTML = items[k].Name;
         var price = document.createElement("td");
-        if(items[k].SellPrice == "" || items[k].SellPrice == "null"){
+        if(items[k].SellPrice == "" || items[k].SellPrice == "null") {
           price.innerHTML = 'N/A';
-        } else{
+        } else {
           price.innerHTML = items[k].SellPrice;
         }
         row.append(name);

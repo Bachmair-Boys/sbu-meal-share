@@ -2,8 +2,7 @@
 
 const userRole = get("userRole");
 const roomID = get("roomID");
-var typing = false;
-var timeout = undefined;
+const userName = get("name");
 
 function escapeHTML(string) {
   const entityMap = {
@@ -27,15 +26,12 @@ function get(name){
     return decodeURIComponent(name[1]);
 }
 
-function onTimeout(){
-  typing = false;
-  io.connect().emit("stopped_typing",{ "room": get('roomID'), "userRole": userRole, name: get("name") });
-}
-
-
 $(function () {
   const socket = io.connect();
   socket.userRole = userRole;
+
+  var typing = false;
+  var timeout = undefined;
 
   if (userRole === "orderer") {
     $('#waiting').html("Please wait for a deliverer to take your order.");
@@ -46,13 +42,14 @@ $(function () {
       $("#chatting-with").css("visibility", "visible");
       $("#waiting").css("display", "none");
       $("#send").prop('disabled', false);
-      $("ul").empty();
+      $("#camera-button").show();
 
-      socket.emit("orderer_name", { roomID: roomID, name: get("name") });
+      socket.emit("orderer_name", { roomID: roomID, name: userName });
     });
   } else if (userRole === "deliverer") { 
     $("#waiting").css("display", "none");
     $("#send").prop('disabled', false);
+    $("#camera-button").show();
 
     socket.on('orderer_name', function(name) {
       $("#chatting-with").html("You are chatting with " + name + ".");
@@ -61,11 +58,11 @@ $(function () {
   }
 
   socket.on('connect', function() {
-    socket.emit('room', { "room": get('roomID'), "userRole": userRole });
+    socket.emit('room', { "room": roomID, "userRole": userRole });
     // Announce to the orderer that the deliverer has joined
     if (userRole == "deliverer")
       socket.emit('deliverer_name', {
-        name: get("name"),
+        name: userName,
         roomID: roomID
       });
   });
@@ -82,7 +79,9 @@ $(function () {
 
   socket.on("user_disconnected", function() {
     $("#send").prop('disabled', true);
+    $("#camera-button").hide();
     $("#chatting-with").css("visibility", "hidden");
+    $("#picture-modal").modal("hide");
     if (userRole === 'deliverer')
       $("#waiting").html("The orderer has left the chat.").css('display', 'block');
     else if (userRole === 'orderer')
@@ -91,8 +90,8 @@ $(function () {
         .css('display', 'block');
   });
 
-  socket.on("typing", function(data){
-    if(data.userRole !== userRole){
+  socket.on("typing", function(data) {
+    if (data.userRole !== userRole) {
       $("#chatting-with").html(data.name  + " is typing...");
     }
   });
@@ -102,7 +101,7 @@ $(function () {
       $("#chatting-with").html("You are chatting with " + data.name + ".");
     }
   });
-  
+
   $('form').submit(function(){
     // Only do something if the message isn't empty
     if ($("#message_text").val() !== "") {
@@ -116,7 +115,7 @@ $(function () {
       cardDiv.addClass("bg-primary text-white");
       cardDiv.addClass("sent");
       $("#messages").append(cardDiv);
-        
+
       socket.emit('chat_message', {
         roomID: roomID,
         message: messageHTML,
@@ -127,20 +126,99 @@ $(function () {
     return false;
   });
 
-  $("#message_text").keydown(function(event){
-      var keycode = event.keyCode || event.which;
-      // Emit "is typing" message for any key pressed besides enter key.
-      if(keycode != 13){
-          if(typing === false){
-            typing = true;
-            socket.emit("typing",{ "room": get('roomID'), "userRole": userRole, name: get("name") });
-            timeout = setTimeout(onTimeout, 2000);
-          }
-          else{
-            clearTimeout(timeout);
-            timeout = setTimeout(onTimeout, 2000);
-          }
+  $("#message_text").keydown(function(event) {
+    const keycode = event.keyCode || event.which;
+    const onTimeout = () =>  {
+      typing = false;
+      socket.emit("stopped_typing", { 
+        room: roomID, 
+        userRole: userRole, 
+        name: userName 
+      });
+    };
+
+    // Emit "is typing" message for any key pressed besides enter key.
+    if (keycode != 13) {
+      if (typing === false) {
+        typing = true;
+        socket.emit("typing", { 
+          room: roomID, 
+          userRole: userRole, 
+          name: userName 
+        });
+        timeout = setTimeout(onTimeout, 2000);
+      } else {
+        clearTimeout(timeout);
+        timeout = setTimeout(onTimeout, 2000);
       }
+    }
   });
 
+  /* Photo functionality */
+  $("#take-photo").click(() => {
+    const video = $("#camera-stream")[0];
+    const canvas = $("#camera-canvas")[0];
+    if (video.srcObject) {
+      const ctx = canvas.getContext("2d");
+      ctx.drawImage(video, 0, 0);
+      $("#taken-photo").attr("src", canvas.toDataURL("img/webp"));
+      $("#camera-stream").hide();
+      $("#taken-photo").show();
+
+      $("#take-photo").hide();
+      $("#discard-photo").show()
+      $("#send-photo").show()
+    }
+  });
+
+  $("#discard-photo").click(() => {
+    $("#discard-photo").hide();
+    $("#send-photo").hide();
+    $("#taken-photo").hide();
+    $("#camera-stream").show();
+    $("#take-photo").show();
+  });
+
+  $("#send-photo").click(() => {
+    $("#picture-modal").modal("hide");
+    $("#discard-photo").hide();
+    $("#send-photo").hide();
+    $("#taken-photo").hide();
+    $("#camera-stream").show();
+    $("#take-photo").show();
+
+    const video = $("#camera-stream")[0];
+    const cardDiv = $("<div></div>").addClass("card mb-3");
+    const cardImage = $("#taken-photo").clone().addClass("card-img-top photo-message").show();
+
+    cardDiv.append(cardImage);
+
+    const messageHTML = cardDiv[0].outerHTML;
+    cardDiv.addClass("bg-primary text-white");
+    cardDiv.addClass("sent");
+    $("#messages").append(cardDiv);
+
+    socket.emit('chat_message', {
+      roomID: roomID,
+      message: messageHTML,
+      from: userRole
+    });
+  });
+
+  $("#camera-button").click(() => {
+    const video = $("#camera-stream")[0];
+    const canvas = $("#camera-canvas")[0];
+    if (!video.srcObject)
+      navigator.mediaDevices.getUserMedia({ video: true }).then(stream => {
+        video.srcObject = stream;
+        video.onloadedmetadata = () => {
+          video.play();
+          canvas.width = video.videoWidth;
+          canvas.height = video.videoHeight;
+          $("#take-photo").show();
+        };
+      }).catch((e) => {
+        alert("Unable to open camera");
+      });
+  });
 });

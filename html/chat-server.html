@@ -1,22 +1,51 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <link rel="stylesheet" href="css/bootstrap.min.css">
-    <link rel="stylesheet" href="css/chat-server.css">
-    <script src="js/jquery-3.2.1.min.js"></script>
-    <script src="js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="css/font-awesome/css/font-awesome.min.css">
+    <script src="https://code.jquery.com/jquery-3.2.1.min.js"
+			      integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
+			      crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" 
+         integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+         crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.3/css/bootstrap.min.css" 
+          integrity="sha384-Zug+QiDoJOrZ5t4lssLdxGhVrurbmBWopoEl+M6BdEfwnCJZtKxi1KgxUyJq13dy" crossorigin="anonymous">
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.3/js/bootstrap.min.js" 
+            integrity="sha384-a5N7Y/aK3qNeh15eJKGWxsqtnX/wWdSZSKp+81YjTmS15nvnvxKHuzaWwXHDli+4" 
+            crossorigin="anonymous"></script>
     <script src="/socket.io/socket.io.js"></script>
+    <link rel="stylesheet" href="css/chat-server.css">
     <script src="js/chat-server.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Meal Share Chat</title>
   </head>
+
+  <body>
   <header>
     <nav class="navbar sticky-top navbar-light bg-light">
+      <div class="navbar-header">
       <a class="navbar-brand" href="/">Meal Share</a>
+      </div>
+      <ul class="nav navbar-nav">
+        <li><span id="camera-button" class="fa fa-camera" data-toggle="modal" data-target="#picture-modal"></span></li>
+      </ul>
     </nav>
   </header>
 
-  <body>
+  <div class="modal fade" id="picture-modal">
+    <div class="modal-dialog" id="camera-modal-dialog">
+      <div class="modal-content">
+        <div class="modal-body">
+          <video id="camera-stream"></video>
+          <canvas id="camera-canvas"></canvas>
+          <img id="taken-photo">
+          <button class="btn btn-primary photo-button" id="take-photo">Take Photo</button>
+          <button class="btn btn-success photo-button" id="send-photo">Send Photo</button>
+          <button class="btn btn-danger photo-button" id="discard-photo">Discard Photo</button>
+        </div>
+      </div>
+    </div>
+  </div>
     <div class="alert alert-warning" id='waiting'></div>
     <div class="alert alert-info" role="alert" id="chatting-with"></div>
     <div id="messages"></div>
@@ -24,7 +53,7 @@
       <div class="input-group">
           <input class="form-control"  type="text" id="message_text" autocomplete="off">
           <span class="input-group-btn">
-            <button class="btn btn-success" id="send" style="cursor:pointer">Send</button>
+            <button class="btn btn-success" id="send">Send</button>
           </span>
       </div>
   </form>

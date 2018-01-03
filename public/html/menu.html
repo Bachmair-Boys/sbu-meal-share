@@ -1,10 +1,6 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <meta charset="utf-8">
-    <meta name="description" content="MealShare">
-    <meta name="author" content="CS 150">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
     <script src="https://code.jquery.com/jquery-3.2.1.min.js"
 			      integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
 			      crossorigin="anonymous"></script>
@@ -16,11 +12,24 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.3/js/bootstrap.min.js" 
             integrity="sha384-a5N7Y/aK3qNeh15eJKGWxsqtnX/wWdSZSKp+81YjTmS15nvnvxKHuzaWwXHDli+4" 
             crossorigin="anonymous"></script>
+    <script src="/js/menu-server.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Menu Test</title>
   </head>
+  <header>
+    <nav class="navbar sticky-top navbar-light bg-light">
+      <a class="navbar-brand" href="/">Meal Share</a>
+    </nav>
+  </header>
+
   <body>
-    <h1>Orders</h1>
-    <div id="orders_div" class="panel-group"></div>
-    <script src="/js/show-orders.js"></script>
+    <h6>Select a Dining Location to see today's menu.</h6>
+    <select class="form-control custom-select" name="dining_location" id="dining_location_input">
+      <option value="Select">Select a Dining Location</option>
+      <option value="East+Side+Dine-In">East Side Dining</option>
+      <option value="West+Side+Dine+In">West Side Dining</option>
+      <option value="Roth+Food+Court">Roth Food Court</option>
+      <option value="SAC+Food+Court">Student Activities Center</option>
+    </select>
   </body>
 </html>
-
