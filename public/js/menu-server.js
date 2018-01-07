@@ -24,7 +24,7 @@ $(function () {
           $("body").append("<p id='closed'>This dining location is currently closed.</p>");
         }
         else{
-          $("body").append(createMenuTable(menu.currentUnit.Venue,false));
+          $("body").append(createMenuTable(data.currentUnit.Venue,false));
         } 
       }
     });
