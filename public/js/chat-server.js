@@ -43,6 +43,7 @@ $(function () {
       $("#waiting").css("display", "none");
       $("#send").prop('disabled', false);
       $("#camera-button").show();
+      $("#menu-button").show();
 
       socket.emit("orderer_name", { roomID: roomID, name: userName });
     });
@@ -50,6 +51,7 @@ $(function () {
     $("#waiting").css("display", "none");
     $("#send").prop('disabled', false);
     $("#camera-button").show();
+    $("#menu-button").hide();
 
     socket.on('orderer_name', function(name) {
       $("#chatting-with").html("You are chatting with " + name + ".");
@@ -58,6 +60,7 @@ $(function () {
   }
 
   socket.on('connect', function() {
+    $("#menu-button").hide();
     socket.emit('room', { "room": roomID, "userRole": userRole });
     // Announce to the orderer that the deliverer has joined
     if (userRole == "deliverer")
@@ -80,8 +83,10 @@ $(function () {
   socket.on("user_disconnected", function() {
     $("#send").prop('disabled', true);
     $("#camera-button").hide();
+    $("#menu-button").hide();
     $("#chatting-with").css("visibility", "hidden");
     $("#picture-modal").modal("hide");
+    $("#menu-modal").modal("hide");
     if (userRole === 'deliverer')
       $("#waiting").html("The orderer has left the chat.").css('display', 'block');
     else if (userRole === 'orderer')
@@ -219,6 +224,39 @@ $(function () {
         };
       }).catch((e) => {
         alert("Unable to open camera");
+      });
+  });
+
+  /* Menu item request functionality */
+  $("#send-selection").click(function() {
+    $("#menu-modal").modal("hide");
+    console.log("running");
+    const cardDiv = $("<div></div>").addClass("card mb-3");
+    const cardBody = $("<div></div>").addClass("card-body");
+    const cardIntro = $("<p></p>").addClass("card-text").html(escapeHTML("I would like the following items: "));
+    const requestedItems = $("<ul></ul>");
+    var checkboxes =  $(".checkbox");
+    var price = 0;
+    for(i = 0; i < checkboxes.length; i++){
+      if(checkboxes[i].checked){
+        const item = $("<li></li>").addClass("card-text").html(escapeHTML(checkboxes[i].id));
+        requestedItems.append(item);
+        console.log(price);
+        checkboxes[i].checked = false;
+      }
+    }
+    cardBody.append(cardIntro);
+    cardBody.append(requestedItems);
+    cardDiv.append(cardBody);
+    const messageHTML = cardDiv[0].outerHTML;
+      cardDiv.addClass("bg-primary text-white");
+      cardDiv.addClass("sent");
+      $("#messages").append(cardDiv);
+
+      socket.emit('chat_message', {
+        roomID: roomID,
+        message: messageHTML,
+        from: userRole
       });
   });
 });

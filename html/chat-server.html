@@ -16,6 +16,7 @@
     <script src="/socket.io/socket.io.js"></script>
     <link rel="stylesheet" href="css/chat-server.css">
     <script src="js/chat-server.js"></script>
+    <script src="js/menu-server.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Meal Share Chat</title>
   </head>
@@ -28,6 +29,7 @@
       </div>
       <ul class="nav navbar-nav">
         <li><span id="camera-button" class="fa fa-camera" data-toggle="modal" data-target="#picture-modal"></span></li>
+        <li><span id="menu-button"  class="btn btn-primary" data-toggle="modal" data-target="#menu-modal">Request Menu Item</span></li>
       </ul>
     </nav>
   </header>
@@ -46,6 +48,17 @@
       </div>
     </div>
   </div>
+
+  <div class="modal fade" id="menu-modal">
+    <div class="modal-dialog" id="menu-modal-dialog">
+      <div class="modal-content">
+        <div class="modal-body" id = "menu-modal-body">
+          <button class="btn btn-success send-button" id="send-selection" disabled="true">Request Menu Items</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
     <div class="alert alert-warning" id='waiting'></div>
     <div class="alert alert-info" role="alert" id="chatting-with"></div>
     <div id="messages"></div>
