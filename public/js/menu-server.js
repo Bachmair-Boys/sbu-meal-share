@@ -32,14 +32,19 @@ $(function () {
 
   $("#menu-button").click(function(){
     
-    //var diningLocation = get("diningLocation");
-    var diningLocation = "SAC+Food+Court";
+    var diningLocation = get("diningLocation");
     var main_url = "https://phapps.compassappstore.com/WebtritionMenuWeb/MenuWorksData/GetJsonMealData?unitId=42141&apiKey=O4SvFVPCfrtFIPKWZiGH3qgsV3IHZJ9hcfqiop0&venue=" + diningLocation + "&year=" + date.getFullYear() + "&month=" + (date.getMonth()+1) + "&day=" + date.getDate();
     
     $.ajax({
       url: (proxy + main_url),
       dataType: "json",
       type: "GET",
+      beforeSend: function(){
+        $('#loading-text').show();
+      },
+      complete: function(){
+          $('#loading-text').hide();
+      },
       success: function(data){
         $("table").remove();
         $("#closed").remove();
@@ -84,13 +89,11 @@ function createMenuTable(data,showCheckboxes) {
             var isChecked = this.checked;
             var i = 0;
             while(!isChecked && i < checkboxes.length){
-              console.log(isChecked);
               isChecked = checkboxes[i].checked;
               i++;
             }
             if(isChecked){
               $("#send-selection").prop("disabled",false);
-              console.log("ischecked..")
             }else{
               $("#send-selection").prop("disabled",true);
             }

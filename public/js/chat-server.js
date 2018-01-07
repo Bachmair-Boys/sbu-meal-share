@@ -236,12 +236,10 @@ $(function () {
     const cardIntro = $("<p></p>").addClass("card-text").html(escapeHTML("I would like the following items: "));
     const requestedItems = $("<ul></ul>");
     var checkboxes =  $(".checkbox");
-    var price = 0;
     for(i = 0; i < checkboxes.length; i++){
       if(checkboxes[i].checked){
         const item = $("<li></li>").addClass("card-text").html(escapeHTML(checkboxes[i].id));
         requestedItems.append(item);
-        console.log(price);
         checkboxes[i].checked = false;
       }
     }

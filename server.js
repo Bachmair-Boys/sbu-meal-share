@@ -37,7 +37,23 @@ app.post("/submit-order", function(req, res) {
 
   order_db.insert(order);
 
-  res.redirect("/chat-with-deliverer?roomID=" + order.order_id + "&userRole=orderer&name=" + encodeURIComponent(req.body.name));
+  //Convert dining location to correct parameter name for AJAX request.
+  var location;
+  switch(req.body.dining_location){
+    case "east_side":
+      location = "East+Side+Dine-In" 
+      break;
+    case "west_side":
+      location = "West+Side+Dine+In"
+      break;
+    case "roth_cafe":
+      location = "Roth+Food+Court"
+      break;
+    case "student_activities_center":
+      location = "SAC+Food+Court"
+      break;
+  }
+  res.redirect("/chat-with-deliverer?roomID=" + order.order_id + "&userRole=orderer&name=" + encodeURIComponent(req.body.name) + "&diningLocation=" + location);
 });
 
 app.get("/chat-with-deliverer", function(req, res) {
